@@ -20,7 +20,7 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		fltMoveSpeed = 0.1f;
-		fltMaxJump = 2f;
+		fltMaxJump = 2.5f;
 		fltJumpAccel = 0.25f;
 		fltGravity = -5.00f;
 		vecGravityCalc = new Vector3 (0, fltGravity, 0);
@@ -32,6 +32,8 @@ public class Player : MonoBehaviour {
 	void Update () {
 		
 		GetInput ();
+		if(blnIsJumping)
+			StartCoroutine (Jump ());
 		rgdPlayer.AddForce(vecGravityCalc);
 	}
 
@@ -54,13 +56,13 @@ public class Player : MonoBehaviour {
 			blnIsJumping = true;
 			blnGrounded = false;
 		} 
-		if (Input.GetKey (KeyCode.W) && blnIsJumping) { //Unintended behavior causing the player to be able to jump only twice before cancelling their ability to jump
+		/*if (Input.GetKey (KeyCode.W) && blnIsJumping) { //Unintended behavior causing the player to be able to jump only twice before cancelling their ability to jump
 				transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
 
 			if (transform.position.y >= (fltJumpStart + fltMaxJump)) {
 				StartCoroutine (Jump ());
 			}
-		}
+		}*/
 
 		if (Input.GetKey (KeyCode.Space) && blnHolding) {
 
@@ -71,8 +73,13 @@ public class Player : MonoBehaviour {
 
 	IEnumerator Jump()//TODO: create delay between jumps
 	{
+		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
+
+		if (transform.position.y >= (fltJumpStart + fltMaxJump)) {
+			blnIsJumping = false;
+		}
 		yield return new WaitForSeconds (1.0f);
-		blnIsJumping = false;
+
 	}
 
 	void OnCollisionEnter(Collision col){
