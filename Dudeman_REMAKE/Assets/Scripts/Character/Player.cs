@@ -3,39 +3,39 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-	float fltMoveSpeed;
-	float fltGrabSpeed;
-	float fltMaxJump;
-	float fltJumpAccel;
-	float fltJumpStart;
-	public float fltGravity;
-	Vector3 vecGravityCalc, vecThrowDirection;
+	private float fltMoveSpeed, fltGrabSpeed, fltMaxJump, fltJumpAccel, fltJumpStart;
 
-	public bool blnIsJumping, blnGrounded, blnHolding;
+	public float fltGravity;
+	public bool blnIsJumping, blnGrounded, blnHolding, blnThrow;
 
 	public GameObject goProjectile;
+	Vector3 vecGravityCalc, vecThrowDirection;
 	Rigidbody rgdPlayer;
 
 	// Use this for initialization
 	void Start () {
 		fltMoveSpeed = 0.1f;
-		fltMaxJump = 2.5f;
+		fltMaxJump = 3f;
 		fltJumpAccel = 0.25f;
 		fltGravity = -15.00f;
 		vecGravityCalc = new Vector3 (0, fltGravity, 0);
-		blnIsJumping = blnHolding = blnGrounded = false;
+		blnIsJumping = blnHolding = blnGrounded = blnThrow = false;
 		rgdPlayer = GetComponent<Rigidbody> ();
 	}
 
 	// Update is called once per frame
 	void Update () {
-		
 		GetInput ();
 		if(blnIsJumping)
 			StartCoroutine (Jump ());
-		rgdPlayer.AddForce(vecGravityCalc);
 		if(blnHolding)
 			goProjectile.transform.position = new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
+		if (blnThrow)
+			StartCoroutine (Throw ());
+	}
+
+	void FixedUpdate(){
+		rgdPlayer.AddForce(vecGravityCalc);
 	}
 
 	void GetInput(){
@@ -49,41 +49,46 @@ public class Player : MonoBehaviour {
 		}
 		if (Input.GetKey (KeyCode.S)) {
 			if (blnIsJumping)
-				fltGravity = -20.0f;
-		}
+				rgdPlayer.AddForce(new Vector3(0, -30, 0));
+		} 
 
-		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { //TODO: make it so that jump can be used only once
+		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { 
 			fltJumpStart = transform.position.y;
 			blnIsJumping = true;
 			blnGrounded = false;
 		} 
-		/*if (Input.GetKey (KeyCode.W) && blnIsJumping) { //Unintended behavior causing the player to be able to jump only twice before cancelling their ability to jump
-				transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
-
-			if (transform.position.y >= (fltJumpStart + fltMaxJump)) {
-				StartCoroutine (Jump ());
-			}
-		}*/
 
 		if (Input.GetKey (KeyCode.Space))
 			BossMan.GetInstance.GrabProjectile ();
 
 		if (Input.GetKey (KeyCode.Space) && blnHolding) {
-			BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
+			blnThrow = true;
 		}
 	}
 
 
 
-	IEnumerator Jump()//TODO: create delay between jumps
+	IEnumerator Jump()
 	{
 		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
+		if (Input.GetKey (KeyCode.W) && blnIsJumping && transform.position.y >= (fltJumpStart + fltMaxJump)) {
+			fltMaxJump = 4.0f;
+			fltJumpAccel = 0.1f;
+		}
 
-		if (transform.position.y >= (fltJumpStart + fltMaxJump)) {
+		if (transform.position.y >= (fltJumpStart + fltMaxJump) || Input.GetKeyUp(KeyCode.W)) {
 			blnIsJumping = false;
+			fltMaxJump = 3.0f;
+			fltJumpAccel = 0.25f;
 		}
 		yield return new WaitForSeconds (1.0f);
 
+	}
+
+	IEnumerator Throw(){ //TODO figure out how to not throw projectile into oblivion
+		yield return new WaitForSeconds (1.0f);
+		blnHolding = false;
+		BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
 	}
 
 	void OnCollisionEnter(Collision col){
@@ -94,6 +99,5 @@ public class Player : MonoBehaviour {
 		if (col.collider.CompareTag ("Projectile")) { 
 			
 		}
-
 	}
 }

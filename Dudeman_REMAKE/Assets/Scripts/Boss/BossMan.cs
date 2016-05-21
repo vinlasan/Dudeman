@@ -1,21 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// BossMan acts as a messenger mainly between the Player and other objects
+/// </summary>
 public class BossMan : MonoBehaviour {
 
 	private static BossMan instance = null;
 
-	public static BossMan GetInstance {
+	/// <summary>
+	/// Provides global access to what should be a singular instance of BossMan
+	/// </summary>
+	public static BossMan GetInstance { 
 		get { return instance; }
 	}
 
-	private Player player;
-	public bool blnCanGrab;
-	GameObject currentProjectile = null;
-	public GameObject updateProjectile{
+	public Player player;
+	GameObject currentProjectile = null; 
+	/// <summary>
+	/// Use to update the current projectile to be used by the player
+	/// </summary>
+	/// <value>The update projectile.</value>
+	public GameObject updateProjectile{ 
 		get { return currentProjectile; }
 		set { currentProjectile = value; } 
 	}
+
+	public bool blnCanGrab;
 
 	// Use this for initialization
 	void Start () {
@@ -24,9 +35,9 @@ public class BossMan : MonoBehaviour {
 		player = GameObject.FindWithTag("Player").GetComponent<Player> ();
 	}
 
-	public void GrabProjectile() //TODO thouroughly comment this shit homie so it's easier to revisit later
+	public void GrabProjectile() 
 	{
-		if (blnCanGrab && !player.blnHolding) {
+		if (blnCanGrab && !player.blnHolding) { //Povided the player isn't holding something already, initiate grab
 			player.goProjectile = currentProjectile;
 			player.blnHolding = true;
 			blnCanGrab = false;

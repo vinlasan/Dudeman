@@ -14,13 +14,15 @@ public class Projectile : MonoBehaviour {
 	}
 
 	void Update(){
-		if (blnThrown)
-			this.transform.position = new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z) + (Vector3)vecThrowDirection;
+		if (blnThrown) {
+			Physics.IgnoreCollision (this.gameObject.GetComponent<Collider> (), BossMan.GetInstance.player.GetComponent<Collider> ());
+			this.gameObject.GetComponent<Collider> ().isTrigger = false;
+			this.transform.Translate ((Vector3)vecThrowDirection * Time.deltaTime);// = new Vector3 (this.transform.position.x + vecThrowDirection.x, this.transform.position.y + vecThrowDirection.y, this.transform.position.z);
+		}
 	}
 
-	void OnTriggerEnter(Collider other){
+	void OnTriggerEnter(Collider other){ //On contact with the player alert the BossMan that this object can be grabbed by ther player
 		if (other.CompareTag ("Player")) {
-			print ("player detected");
 			BossMan.GetInstance.updateProjectile = this.gameObject;
 			BossMan.GetInstance.blnCanGrab = true;
 		}
