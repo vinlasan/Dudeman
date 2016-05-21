@@ -11,8 +11,7 @@ public class Player : MonoBehaviour {
 	public float fltGravity;
 	Vector3 vecGravityCalc, vecThrowDirection;
 
-	public bool blnIsJumping, blnGrounded;
-	bool blnHolding, blnInteractable, blnGrab;
+	public bool blnIsJumping, blnGrounded, blnHolding;
 
 	public GameObject goProjectile;
 	Rigidbody rgdPlayer;
@@ -22,9 +21,9 @@ public class Player : MonoBehaviour {
 		fltMoveSpeed = 0.1f;
 		fltMaxJump = 2.5f;
 		fltJumpAccel = 0.25f;
-		fltGravity = -5.00f;
+		fltGravity = -15.00f;
 		vecGravityCalc = new Vector3 (0, fltGravity, 0);
-		blnIsJumping = blnHolding = blnGrounded = blnGrab = blnInteractable = false;
+		blnIsJumping = blnHolding = blnGrounded = false;
 		rgdPlayer = GetComponent<Rigidbody> ();
 	}
 
@@ -35,6 +34,8 @@ public class Player : MonoBehaviour {
 		if(blnIsJumping)
 			StartCoroutine (Jump ());
 		rgdPlayer.AddForce(vecGravityCalc);
+		if(blnHolding)
+			goProjectile.transform.position = new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
 	}
 
 	void GetInput(){
@@ -64,8 +65,11 @@ public class Player : MonoBehaviour {
 			}
 		}*/
 
-		if (Input.GetKey (KeyCode.Space) && blnHolding) {
+		if (Input.GetKey (KeyCode.Space))
+			BossMan.GetInstance.GrabProjectile ();
 
+		if (Input.GetKey (KeyCode.Space) && blnHolding) {
+			BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
 		}
 	}
 
@@ -87,9 +91,8 @@ public class Player : MonoBehaviour {
 			blnGrounded = true;
 		}
 
-		if (col.collider.CompareTag ("Projectile")) { // Change to check if they are colliding with hands
-			if (Input.GetKey (KeyCode.Space)) 
-				goProjectile = col.gameObject;
+		if (col.collider.CompareTag ("Projectile")) { 
+			
 		}
 
 	}
