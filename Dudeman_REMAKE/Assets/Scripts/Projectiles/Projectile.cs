@@ -7,7 +7,7 @@ public class Projectile : MonoBehaviour {
 	protected float fltDamage;
 
 	public bool blnThrown;
-	protected Vector2 vecThrowDirection;
+	public Vector3 vecThrowDirection;
 
 	void Start(){
 		blnThrown = false;
@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour {
 		if (blnThrown) {
 			Physics.IgnoreCollision (this.gameObject.GetComponent<Collider> (), BossMan.GetInstance.player.GetComponent<Collider> ());
 			this.gameObject.GetComponent<Collider> ().isTrigger = false;
-			this.transform.Translate ((Vector3)vecThrowDirection * Time.deltaTime);// = new Vector3 (this.transform.position.x + vecThrowDirection.x, this.transform.position.y + vecThrowDirection.y, this.transform.position.z);
+			this.transform.position = (new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z) + vecThrowDirection*Time.deltaTime);
 		}
 	}
 
@@ -29,7 +29,9 @@ public class Projectile : MonoBehaviour {
 	}
 
 	void OnTriggerExit(Collider other){
-		if (other.CompareTag ("Player"))
+		if (other.CompareTag ("Player")) {
 			BossMan.GetInstance.blnCanGrab = false;
+			BossMan.GetInstance.updateProjectile = null;
+		}
 	}
 }

@@ -30,8 +30,6 @@ public class Player : MonoBehaviour {
 			StartCoroutine (Jump ());
 		if(blnHolding)
 			goProjectile.transform.position = new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
-		if (blnThrow)
-			StartCoroutine (Throw ());
 	}
 
 	void FixedUpdate(){
@@ -41,11 +39,11 @@ public class Player : MonoBehaviour {
 	void GetInput(){
 		if (Input.GetKey (KeyCode.D)) {
 			transform.position = new Vector3 (transform.position.x + fltMoveSpeed, transform.position.y, transform.position.z);
-			vecThrowDirection = new Vector3 (5, 0, 0);
+			vecThrowDirection = new Vector3 (25, 0, 0);
 		}
 		if (Input.GetKey (KeyCode.A)) {
 			transform.position = new Vector3 (transform.position.x - fltMoveSpeed, transform.position.y, transform.position.z);
-			vecThrowDirection = new Vector3 (-5, 0, 0);
+			vecThrowDirection = new Vector3 (-25, 0, 0);
 		}
 		if (Input.GetKey (KeyCode.S)) {
 			if (blnIsJumping)
@@ -58,11 +56,11 @@ public class Player : MonoBehaviour {
 			blnGrounded = false;
 		} 
 
-		if (Input.GetKey (KeyCode.Space))
+		if (Input.GetKeyDown (KeyCode.Space) && !blnHolding)
 			BossMan.GetInstance.GrabProjectile ();
-
-		if (Input.GetKey (KeyCode.Space) && blnHolding) {
-			blnThrow = true;
+		
+		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) {
+				Throw ();
 		}
 	}
 
@@ -85,8 +83,8 @@ public class Player : MonoBehaviour {
 
 	}
 
-	IEnumerator Throw(){ //TODO figure out how to not throw projectile into oblivion
-		yield return new WaitForSeconds (1.0f);
+	void Throw(){ //TODO figure out how to not throw projectile into oblivion
+		//yield return new WaitForSeconds (1.0f);
 		blnHolding = false;
 		BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
 	}

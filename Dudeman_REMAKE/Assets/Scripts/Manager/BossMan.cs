@@ -47,5 +47,6 @@ public class BossMan : MonoBehaviour {
 	public void ThrowProjectile(Projectile projectile, Vector3 direction)
 	{
 		projectile.blnThrown = true;
+		projectile.vecThrowDirection = direction;
 	}
 }
