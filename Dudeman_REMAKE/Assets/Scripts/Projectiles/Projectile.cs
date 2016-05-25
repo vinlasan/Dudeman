@@ -34,4 +34,8 @@ public class Projectile : MonoBehaviour {
 			BossMan.GetInstance.updateProjectile = null;
 		}
 	}
+
+	void OnCollisionEnter (Collision other){
+		
+	}
 }

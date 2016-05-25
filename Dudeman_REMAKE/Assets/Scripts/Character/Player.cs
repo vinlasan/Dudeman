@@ -3,9 +3,9 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-	private float fltMoveSpeed, fltGrabSpeed, fltMaxJump, fltJumpAccel, fltJumpStart;
+	private float fltMoveSpeed, fltGrabSpeed, fltJumpAccel, fltJumpStart;
 
-	public float fltGravity;
+	public float fltGravity, fltMaxJump;
 	public bool blnIsJumping, blnGrounded, blnHolding, blnThrow;
 
 	public GameObject goProjectile;
@@ -14,7 +14,7 @@ public class Player : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		fltMoveSpeed = 0.1f;
+		fltMoveSpeed = 10.0f;
 		fltMaxJump = 3f;
 		fltJumpAccel = 0.25f;
 		fltGravity = -15.00f;
@@ -38,17 +38,18 @@ public class Player : MonoBehaviour {
 
 	void GetInput(){
 		if (Input.GetKey (KeyCode.D)) {
-			transform.position = new Vector3 (transform.position.x + fltMoveSpeed, transform.position.y, transform.position.z);
+			transform.position = new Vector3 (transform.position.x + fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
 			vecThrowDirection = new Vector3 (25, 0, 0);
 		}
 		if (Input.GetKey (KeyCode.A)) {
-			transform.position = new Vector3 (transform.position.x - fltMoveSpeed, transform.position.y, transform.position.z);
+			transform.position = new Vector3 (transform.position.x - fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
 			vecThrowDirection = new Vector3 (-25, 0, 0);
 		}
-		if (Input.GetKey (KeyCode.S)) {
+		/*if (Input.GetKey (KeyCode.S)) {//maybe put a stomp in there
 			if (blnIsJumping)
-				rgdPlayer.AddForce(new Vector3(0, -30, 0));
-		} 
+				transform.position = new Vector3 (transform.position.x, transform.position.y - fltMoveSpeed*1.5f, transform.position.z);
+				//rgdPlayer.AddForce(new Vector3(0, -30, 0));
+		}*/ 
 
 		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { 
 			fltJumpStart = transform.position.y;
@@ -64,8 +65,6 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-
-
 	IEnumerator Jump()
 	{
 		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
@@ -80,11 +79,9 @@ public class Player : MonoBehaviour {
 			fltJumpAccel = 0.25f;
 		}
 		yield return new WaitForSeconds (1.0f);
-
 	}
 
-	void Throw(){ //TODO figure out how to not throw projectile into oblivion
-		//yield return new WaitForSeconds (1.0f);
+	void Throw(){ 
 		blnHolding = false;
 		BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
 	}
