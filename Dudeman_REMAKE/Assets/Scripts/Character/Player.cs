@@ -21,6 +21,7 @@ public class Player : MonoBehaviour {
 		vecGravityCalc = new Vector3 (0, fltGravity, 0);
 		blnIsJumping = blnHolding = blnGrounded = blnThrow = false;
 		rgdPlayer = GetComponent<Rigidbody> ();
+		vecThrowDirection = new Vector3 (25, 0, 0);
 	}
 
 	// Update is called once per frame
@@ -61,7 +62,7 @@ public class Player : MonoBehaviour {
 			BossMan.GetInstance.GrabProjectile ();
 		
 		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) {
-				Throw ();
+			StartCoroutine(Throw ());
 		}
 	}
 
@@ -81,9 +82,11 @@ public class Player : MonoBehaviour {
 		yield return new WaitForSeconds (1.0f);
 	}
 
-	void Throw(){ 
+	IEnumerator Throw(){ 
 		blnHolding = false;
-		BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
+		if(BossMan.GetInstance.currentProjectile != null)
+			BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
+		yield return new WaitForSeconds (1.0f);
 	}
 
 	void OnCollisionEnter(Collision col){

@@ -11,7 +11,7 @@ public class Camera : MonoBehaviour {
 		fltCameraBounds = Screen.width/2;
 		fltScreenHeight = Screen.height;
 		fltScreenWidth = Screen.width;
-		fltTransitionSpeed = 2;
+		fltTransitionSpeed = 1.5f;
 	}
 
 	// Update is called once per frame

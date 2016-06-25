@@ -16,7 +16,7 @@ public class BossMan : MonoBehaviour {
 	}
 
 	public Player player;
-	GameObject currentProjectile = null; 
+    public GameObject currentProjectile = null; 
 	/// <summary>
 	/// Use to update the current projectile to be used by the player
 	/// </summary>
@@ -48,5 +48,7 @@ public class BossMan : MonoBehaviour {
 	{
 		projectile.blnThrown = true;
 		projectile.vecThrowDirection = direction;
+		Physics.IgnoreCollision (projectile.gameObject.GetComponent<Collider> (), BossMan.GetInstance.player.GetComponent<Collider> ());
+		projectile.gameObject.GetComponent<Collider> ().isTrigger = false;
 	}
 }

@@ -11,13 +11,12 @@ public class Projectile : MonoBehaviour {
 
 	void Start(){
 		blnThrown = false;
+		vecThrowDirection = new Vector3(0, 0, 0);
 	}
 
 	void Update(){
 		if (blnThrown) {
-			Physics.IgnoreCollision (this.gameObject.GetComponent<Collider> (), BossMan.GetInstance.player.GetComponent<Collider> ());
-			this.gameObject.GetComponent<Collider> ().isTrigger = false;
-			this.transform.position = (new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z) + vecThrowDirection*Time.deltaTime);
+			this.transform.position = (new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z) + vecThrowDirection * Time.deltaTime);
 		}
 	}
 
