@@ -21,7 +21,6 @@ public class Camera : MonoBehaviour {
 
 		if (goPlayer.transform.position.x < fltScreenWidth + fltCameraBounds)
 			this.transform.position =  new Vector3 (goPlayer.transform.position.x + (fltTransitionSpeed * Time.deltaTime) , goPlayer.transform.position.y, this.transform.position.z);
-			
 
 		//this.gameObject.transform.position = new Vector3 (goPlayer.transform.position.x - 0.5f, goPlayer.transform.position.y + 1.5f, -10);
 	}

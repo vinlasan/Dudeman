@@ -37,7 +37,7 @@ public class BossMan : MonoBehaviour {
 
 	public void GrabProjectile() 
 	{
-		if (blnCanGrab && !player.blnHolding) { //Povided the player isn't holding something already, initiate grab
+		if (!player.blnHolding && currentProjectile != null) { //Povided the player isn't holding something already, initiate grab
 			player.goProjectile = currentProjectile;
 			player.blnHolding = true;
 			blnCanGrab = false;

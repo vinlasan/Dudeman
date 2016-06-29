@@ -9,7 +9,9 @@ public class BigBad : NPC_Base
 	// Use this for initialization
 	void Start ()
 	{
-	
+		intHealth = 10;
+		intDamage = 1;
+		fltCooldown = 2.5f;
 	}
 	
 	// Update is called once per frame

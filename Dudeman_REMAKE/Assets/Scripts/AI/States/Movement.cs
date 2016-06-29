@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Movement : MonoBehaviour
+public class Movement : NPC_State<BigBad>
 {
 
 	// Use this for initialization
@@ -9,10 +9,16 @@ public class Movement : MonoBehaviour
 	{
 	
 	}
+
+	public void Enter(){
 	
-	// Update is called once per frame
-	void Update ()
-	{
+	}
+
+	public void Execute(){
+	
+	}
+
+	public void Exit(){
 	
 	}
 }

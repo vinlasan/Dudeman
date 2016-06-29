@@ -6,31 +6,32 @@ public class Player : MonoBehaviour {
 	private float fltMoveSpeed, fltGrabSpeed, fltJumpAccel, fltJumpStart;
 
 	public float fltGravity, fltMaxJump;
-	public bool blnIsJumping, blnGrounded, blnHolding, blnThrow;
+	public bool blnIsJumping, blnGrounded, blnCanJump, blnHolding, blnThrow, blnCanGrab;
 
 	public GameObject goProjectile;
-	Vector3 vecGravityCalc, vecThrowDirection;
+	Vector3 vecGravityCalc, vecThrowDirection, vecProjectileOffset;
 	Rigidbody rgdPlayer;
 
 	// Use this for initialization
 	void Start () {
 		fltMoveSpeed = 10.0f;
 		fltMaxJump = 3f;
-		fltJumpAccel = 0.25f;
-		fltGravity = -15.00f;
+		fltJumpAccel = 12.0f;
+		fltGravity = -15.0f;
 		vecGravityCalc = new Vector3 (0, fltGravity, 0);
-		blnIsJumping = blnHolding = blnGrounded = blnThrow = false;
+		blnIsJumping = blnHolding = blnGrounded = blnThrow = blnCanJump = blnCanGrab = false;
 		rgdPlayer = GetComponent<Rigidbody> ();
 		vecThrowDirection = new Vector3 (25, 0, 0);
+		vecProjectileOffset = new Vector3 (0, 0.5f, 0);
 	}
 
 	// Update is called once per frame
 	void Update () {
 		GetInput ();
-		if(blnIsJumping)
-			StartCoroutine (Jump ());
+		//if(blnIsJumping)
+			//StartCoroutine (Jump ());
 		if(blnHolding)
-			goProjectile.transform.position = new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
+			goProjectile.transform.position = (this.transform.position + vecProjectileOffset);  //new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
 	}
 
 	void FixedUpdate(){
@@ -52,41 +53,54 @@ public class Player : MonoBehaviour {
 				//rgdPlayer.AddForce(new Vector3(0, -30, 0));
 		}*/ 
 
-		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { 
+		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { //Jumping
 			fltJumpStart = transform.position.y;
 			blnIsJumping = true;
 			blnGrounded = false;
 		} 
 
-		if (Input.GetKeyDown (KeyCode.Space) && !blnHolding)
+		if (Input.GetKey (KeyCode.W) && blnIsJumping){ 
+			Jump ();
+		}
+
+		if (Input.GetKeyDown (KeyCode.Space) && !blnHolding) //Grabbing
 			BossMan.GetInstance.GrabProjectile ();
-		
-		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) {
+		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) { //TODO make is so that you can't pick up another object in the same frame you throw an object
 			StartCoroutine(Throw ());
 		}
 	}
 
-	IEnumerator Jump()
+	void Jump()
 	{
-		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel, transform.position.z);
-		if (Input.GetKey (KeyCode.W) && blnIsJumping && transform.position.y >= (fltJumpStart + fltMaxJump)) {
+		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel * Time.deltaTime, transform.position.z);
+		/*if (Input.GetKey (KeyCode.W) && blnIsJumping && transform.position.y >= (fltJumpStart + fltMaxJump)) {
 			fltMaxJump = 4.0f;
-			fltJumpAccel = 0.1f;
-		}
-
+			fltJumpAccel = 10.0f;
+		}*/
 		if (transform.position.y >= (fltJumpStart + fltMaxJump) || Input.GetKeyUp(KeyCode.W)) {
-			blnIsJumping = false;
-			fltMaxJump = 3.0f;
-			fltJumpAccel = 0.25f;
+			StartCoroutine (JumpCooldown ());
+			//fltMaxJump = 3.0f;
+			//fltJumpAccel = 12.0f;
+		}
+	}
+
+	IEnumerator JumpCooldown(){
+		blnIsJumping = false;
+		yield return new WaitForSeconds (1.5f);
+		blnCanJump = true;
+	}
+
+	IEnumerator Throw(){ 
+		if (BossMan.GetInstance.currentProjectile != null) {
+			blnHolding = false;
+			BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile> (), vecThrowDirection);
 		}
 		yield return new WaitForSeconds (1.0f);
 	}
 
-	IEnumerator Throw(){ 
-		blnHolding = false;
-		if(BossMan.GetInstance.currentProjectile != null)
-			BossMan.GetInstance.ThrowProjectile (BossMan.GetInstance.updateProjectile.GetComponent<Projectile>(), vecThrowDirection);
+	IEnumerator GrabCooldown(){
 		yield return new WaitForSeconds (1.0f);
+		blnCanGrab = true;
 	}
 
 	void OnCollisionEnter(Collision col){
