@@ -7,11 +7,12 @@ public class Projectile : MonoBehaviour {
 	protected float fltDamage;
     public float despawnTimer;
 
-	public bool blnThrown;
+    public bool blnThrown,
+        rip;
 	public Vector3 vecThrowDirection;
 
 	void Start(){
-		blnThrown = false;
+		blnThrown = rip = false;
 		vecThrowDirection = new Vector3(0, 0, 0);
         despawnTimer = 3.2f;
 	}
@@ -35,6 +36,7 @@ public class Projectile : MonoBehaviour {
     protected virtual IEnumerator Despawn()
     {
         yield return new WaitForSeconds(despawnTimer);
+        rip = true;
         DestroyImmediate(this.gameObject);
     }
 
