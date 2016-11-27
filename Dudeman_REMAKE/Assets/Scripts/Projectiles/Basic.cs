@@ -5,14 +5,13 @@ public class Basic : Projectile {
 
 	// Use this for initialization
 	void Start () {
-		fltThrowSpeed = 2.0f;
+		fltThrowSpeed = 0.85f;
 		fltDamage = 1.2f;
 		blnThrown = false;
+        despawnTimer = 4.0f;
 	}
 
-	void FixedUpdate () {
-		if (blnThrown) {
-			this.gameObject.transform.position += (Vector3)vecThrowDirection;
-		}
+	protected override void Update () {
+        base.Update();
 	}
 }

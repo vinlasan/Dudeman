@@ -65,7 +65,7 @@ public class Player : MonoBehaviour {
 
 		if (Input.GetKeyDown (KeyCode.Space) && !blnHolding) //Grabbing
 			BossMan.GetInstance.GrabProjectile ();
-		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) { //TODO make is so that you can't pick up another object in the same frame you throw an object
+		else if (Input.GetKeyDown (KeyCode.Space) && blnHolding) { //TODO make it so that you can't pick up another object in the same frame you throw an object
 			StartCoroutine(Throw ());
 		}
 	}

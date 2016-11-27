@@ -46,6 +46,7 @@ public class BossMan : MonoBehaviour {
 
 	public void ThrowProjectile(Projectile projectile, Vector3 direction)
 	{
+        projectile.Setup();
 		projectile.blnThrown = true;
 		projectile.vecThrowDirection = direction;
 		Physics.IgnoreCollision (projectile.gameObject.GetComponent<Collider> (), BossMan.GetInstance.player.GetComponent<Collider> ());
