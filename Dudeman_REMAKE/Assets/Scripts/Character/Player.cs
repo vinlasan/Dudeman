@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Rewired;
 
 public class Player : MonoBehaviour {
+
+    public int playerID = 0;
 
 	private float fltMoveSpeed, fltGrabSpeed, fltJumpAccel, fltJumpStart;
 
@@ -11,9 +14,11 @@ public class Player : MonoBehaviour {
 	public GameObject goProjectile;
 	Vector3 vecGravityCalc, vecThrowDirection, vecProjectileOffset;
 	Rigidbody rgdPlayer;
+    Rewired.Player conPlayer;
 
 	// Use this for initialization
 	void Start () {
+        conPlayer = ReInput.players.GetPlayer(playerID);
 		fltMoveSpeed = 10.0f;
 		fltMaxJump = 3f;
 		fltJumpAccel = 12.0f;
@@ -27,39 +32,38 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		GetInput ();
-		//if(blnIsJumping)
-			//StartCoroutine (Jump ());
 		if(blnHolding)
 			goProjectile.transform.position = (this.transform.position + vecProjectileOffset);  //new Vector3 (this.transform.position.x, this.transform.position.y + 0.5f, this.transform.position.z); 
 	}
 
 	void FixedUpdate(){
 		rgdPlayer.AddForce(vecGravityCalc);
-	}
+        GetInput();
+    }
 
 	void GetInput(){
-		if (Input.GetKey (KeyCode.D)) {
+		if (conPlayer.GetAxis("Move Horizontal") > 0) {
 			transform.position = new Vector3 (transform.position.x + fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
 			vecThrowDirection = new Vector3 (25, 0, 0);
 		}
-		if (Input.GetKey (KeyCode.A)) {
+		if (conPlayer.GetAxis("Move Horizontal") < 0) {
 			transform.position = new Vector3 (transform.position.x - fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
 			vecThrowDirection = new Vector3 (-25, 0, 0);
 		}
-		/*if (Input.GetKey (KeyCode.S)) {//maybe put a stomp in there
+        /*if (Input.GetKey (KeyCode.S)) {//maybe put a stomp in there
 			if (blnIsJumping)
 				transform.position = new Vector3 (transform.position.x, transform.position.y - fltMoveSpeed*1.5f, transform.position.z);
 				//rgdPlayer.AddForce(new Vector3(0, -30, 0));
-		}*/ 
+		}*/
 
-		if (Input.GetKeyDown (KeyCode.W) && blnGrounded && !blnIsJumping) { //Jumping
-			fltJumpStart = transform.position.y;
-			blnIsJumping = true;
-			blnGrounded = false;
-		} 
+        if (conPlayer.GetAxis("Jump") > 0 && blnGrounded && !blnIsJumping)
+        { //Jumping
+            fltJumpStart = transform.position.y;
+            blnIsJumping = true;
+            blnGrounded = false;
+        }
 
-		if (Input.GetKey (KeyCode.W) && blnIsJumping){ 
+        if (conPlayer.GetAxis("Jump") > 0 && blnIsJumping){ 
 			Jump ();
 		}
 
@@ -72,16 +76,16 @@ public class Player : MonoBehaviour {
 
 	void Jump()
 	{
-		transform.position = new Vector3 (transform.position.x, transform.position.y + fltJumpAccel * Time.deltaTime, transform.position.z);
-		/*if (Input.GetKey (KeyCode.W) && blnIsJumping && transform.position.y >= (fltJumpStart + fltMaxJump)) {
-			fltMaxJump = 4.0f;
-			fltJumpAccel = 10.0f;
-		}*/
-		if (transform.position.y >= (fltJumpStart + fltMaxJump) || Input.GetKeyUp(KeyCode.W)) {
-			StartCoroutine (JumpCooldown ());
-			//fltMaxJump = 3.0f;
-			//fltJumpAccel = 12.0f;
-		}
+		transform.position = new Vector3 (transform.position.x, Mathf.Clamp(transform.position.y + fltJumpAccel * Time.deltaTime,fltJumpStart,fltMaxJump), transform.position.z);
+		//if (Input.GetKey (KeyCode.W) && blnIsJumping && transform.position.y >= (fltJumpStart + fltMaxJump)) {
+		//	fltMaxJump = 4.0f;
+		//	fltJumpAccel = 10.0f;
+		//}
+		//if (transform.position.y >= (fltJumpStart + fltMaxJump) || Input.GetKeyUp(KeyCode.W)) {
+		//	StartCoroutine (JumpCooldown ());
+		//	fltMaxJump = 3.0f;
+		//	fltJumpAccel = 12.0f;
+		//}
 	}
 
 	IEnumerator JumpCooldown(){
