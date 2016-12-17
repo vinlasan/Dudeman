@@ -14,12 +14,11 @@ public class Player : MonoBehaviour {
 	public GameObject goProjectile;
 	Vector3 vecGravityCalc, vecThrowDirection, vecProjectileOffset;
 	Rigidbody rgdPlayer;
-    Rewired.Player conPlayer;
+    InputManager inManager;
 
 	// Use this for initialization
 	void Start () {
-        conPlayer = ReInput.players.GetPlayer(playerID);
-		fltMoveSpeed = 10.0f;
+		fltMoveSpeed = 0.75f;
 		fltMaxJump = 3f;
 		fltJumpAccel = 12.0f;
 		fltGravity = -15.0f;
@@ -28,6 +27,7 @@ public class Player : MonoBehaviour {
 		rgdPlayer = GetComponent<Rigidbody> ();
 		vecThrowDirection = new Vector3 (25, 0, 0);
 		vecProjectileOffset = new Vector3 (0, 0.5f, 0);
+        inManager = gameObject.GetComponent<InputManager>();
 	}
 
 	// Update is called once per frame
@@ -37,33 +37,36 @@ public class Player : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
-		rgdPlayer.AddForce(vecGravityCalc);
         GetInput();
     }
 
 	void GetInput(){
-		if (conPlayer.GetAxis("Move Horizontal") > 0) {
-			transform.position = new Vector3 (transform.position.x + fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
-			vecThrowDirection = new Vector3 (25, 0, 0);
-		}
-		if (conPlayer.GetAxis("Move Horizontal") < 0) {
-			transform.position = new Vector3 (transform.position.x - fltMoveSpeed * Time.deltaTime, transform.position.y, transform.position.z);
-			vecThrowDirection = new Vector3 (-25, 0, 0);
-		}
+        if (inManager.direction.x > 0)
+        {
+            transform.position = new Vector3(transform.position.x + fltMoveSpeed, transform.position.y, transform.position.z);
+            vecThrowDirection = inManager.direction;
+        }
+        if (inManager.direction.x < 0)
+        {
+            transform.position = new Vector3(transform.position.x - fltMoveSpeed, transform.position.y, transform.position.z);
+            vecThrowDirection = inManager.direction;
+        }
+
         /*if (Input.GetKey (KeyCode.S)) {//maybe put a stomp in there
 			if (blnIsJumping)
 				transform.position = new Vector3 (transform.position.x, transform.position.y - fltMoveSpeed*1.5f, transform.position.z);
-				//rgdPlayer.AddForce(new Vector3(0, -30, 0));
+				rgdPlayer.AddForce(new Vector3(0, -30, 0));
 		}*/
 
-        if (conPlayer.GetAxis("Jump") > 0 && blnGrounded && !blnIsJumping)
+
+        if ( inManager.blnJumpFloat && blnGrounded && !blnIsJumping)
         { //Jumping
             fltJumpStart = transform.position.y;
             blnIsJumping = true;
             blnGrounded = false;
         }
 
-        if (conPlayer.GetAxis("Jump") > 0 && blnIsJumping){ 
+        if (inManager.blnJump && blnIsJumping){ 
 			Jump ();
 		}
 
@@ -105,15 +108,5 @@ public class Player : MonoBehaviour {
 	IEnumerator GrabCooldown(){
 		yield return new WaitForSeconds (1.0f);
 		blnCanGrab = true;
-	}
-
-	void OnCollisionEnter(Collision col){
-		if(col.collider.CompareTag("Ground")){
-			blnGrounded = true;
-		}
-
-		if (col.collider.CompareTag ("Projectile")) { 
-			
-		}
 	}
 }
